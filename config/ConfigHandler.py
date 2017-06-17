@@ -32,8 +32,8 @@ class ConfigHandler:
         return value
 
     @staticmethod
-    def getint(key):
-        return ConfigHandler._cfg.getint(ConfigHandler.CONFIG_MODE, key)
+    def getint(key, config_mode):
+        return ConfigHandler._cfg.getint(config_mode, key)
 
     @staticmethod
     def getfloat(key):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 
 from Tokens import Tokens
@@ -5,8 +6,6 @@ from config.ConfigHandler import ConfigHandler
 from nltk.tokenize import word_tokenize
 
 from tensorflow.python.platform import gfile
-
-from tensorflow
 
 
 def create_vocab(vocab_path, data_path, max_vocab_size):
@@ -21,7 +20,7 @@ def create_vocab(vocab_path, data_path, max_vocab_size):
                 if line_counter % 100000 == 0:
                     logging.info("\t\tprocessing line {}".format(line_counter))
 
-                tokens = word_tokenize(line)
+                tokens = [word.rstrip('-') for word in word_tokenize(line.decode('utf-8'))]
                 for word in tokens:
                     if word in dict_vocab:
                         dict_vocab[word] += 1
@@ -129,3 +128,5 @@ def prepare_datasets():
             "enc_path": enc_test_idx_path, "dec_path": dec_test_idx_path
         }
     }
+
+prepare_datasets()
