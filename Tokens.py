@@ -10,4 +10,4 @@ class Tokens:
     EOS = _TOKEN(value="<EOS>", idx=2)
     UNK = _TOKEN(value="<UNK>", idx=3)
 
-    list_tokens = [PAD.value, GO.value, UNK.value, EOS.value]
+    list_tokens = [PAD.value, GO.value, EOS.value, UNK.value]

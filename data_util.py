@@ -1,11 +1,51 @@
 # -*- coding: utf-8 -*-
 import logging
+import sys
+import ast
 
 from Tokens import Tokens
 from config.ConfigHandler import ConfigHandler
 from nltk.tokenize import word_tokenize
 
 from tensorflow.python.platform import gfile
+
+BUCKETS = ast.literal_eval(ConfigHandler.get("buckets", "model_param"))
+
+
+def read_data(source_path, target_path, buckets=BUCKETS, max_size=None):
+    """Read data from source and target files and put into buckets.
+    Args:
+    source_path: path to the files with token-ids for the source language.
+    target_path: path to the file with token-ids for the target language;
+      it must be aligned with the source file: n-th line contains the desired
+      output for n-th line from the source_path.
+    max_size: maximum number of lines to read, all other will be ignored;
+      if 0 or None, data files will be read completely (no limit).
+    Returns:
+    data_set: a list of length len(_buckets); data_set[n] contains a list of
+      (source, target) pairs read from the provided data files that fit
+      into the n-th bucket, i.e., such that len(source) < _buckets[n][0] and
+      len(target) < _buckets[n][1]; source and target are lists of token-ids.
+    """
+    data_set = [[] for _ in buckets]
+    with gfile.GFile(source_path, mode="r") as source_file:
+        with gfile.GFile(target_path, mode="r") as target_file:
+            source, target = source_file.readline(), target_file.readline()
+            counter = 0
+            while source and target and (not max_size or counter < max_size):
+                counter += 1
+                if counter % 100000 == 0:
+                    print("  reading data line %d" % counter)
+                    sys.stdout.flush()
+                source_ids = [int(x) for x in source.split()]
+                target_ids = [int(x) for x in target.split()]
+                target_ids.append(Tokens.EOS.idx)
+                for bucket_id, (source_size, target_size) in enumerate(buckets):
+                    if len(source_ids) < source_size and len(target_ids) < target_size:
+                        data_set[bucket_id].append([source_ids, target_ids])
+                        break
+                source, target = source_file.readline(), target_file.readline()
+    return data_set
 
 
 def create_vocab(vocab_path, data_path, max_vocab_size):
@@ -20,7 +60,7 @@ def create_vocab(vocab_path, data_path, max_vocab_size):
                 if line_counter % 100000 == 0:
                     logging.info("\t\tprocessing line {}".format(line_counter))
 
-                tokens = [word.rstrip('-') for word in word_tokenize(line.decode('utf-8'))]
+                tokens = [word.rstrip('-') for word in word_tokenize(line.decode('utf-8', errors='replace'))]
                 for word in tokens:
                     if word in dict_vocab:
                         dict_vocab[word] += 1
@@ -66,7 +106,7 @@ def data_to_token_ids(data_path, target_path, vocab_path):
 
         logging.info("tokenizing data in {}".format(data_path))
 
-        word2idx, _ = get_wrd2idx(vocab_path)
+        word2idx = get_wrd2idx(vocab_path)
 
         with gfile.GFile(data_path, mode="rb") as data_file:
             with gfile.GFile(target_path, mode="w") as tokens_file:
@@ -119,14 +159,4 @@ def prepare_datasets():
     dec_test_idx_path = "{}_{}.idx".format(test_dec, dec_vocab_size)
     data_to_token_ids(test_dec, dec_test_idx_path, dec_vocab_path)
 
-    return {
-        "train": {
-            "enc_path": enc_train_idx_path, "dec_path": dec_train_idx_path, "enc_vocab": enc_vocab_path,
-            "dec_vocab": dec_vocab_path
-        },
-        "test": {
-            "enc_path": enc_test_idx_path, "dec_path": dec_test_idx_path
-        }
-    }
-
-prepare_datasets()
+    return enc_train_idx_path, dec_train_idx_path, enc_test_idx_path, dec_test_idx_path, enc_vocab_path, dec_vocab_path
