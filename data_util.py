@@ -9,6 +9,8 @@ from nltk.tokenize import word_tokenize
 
 from tensorflow.python.platform import gfile
 
+__author__ = "roopal_garg"
+
 BUCKETS = ast.literal_eval(ConfigHandler.get("buckets", "model_param"))
 
 
@@ -35,7 +37,7 @@ def read_data(source_path, target_path, buckets=BUCKETS, max_size=None):
             while source and target and (not max_size or counter < max_size):
                 counter += 1
                 if counter % 100000 == 0:
-                    print("  reading data line %d" % counter)
+                    logging.info("\treading data line {}".format(counter))
                     sys.stdout.flush()
                 source_ids = [int(x) for x in source.split()]
                 target_ids = [int(x) for x in target.split()]

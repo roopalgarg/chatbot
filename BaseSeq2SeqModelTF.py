@@ -4,7 +4,6 @@ import logging
 import os
 import time
 import math
-import sys
 import random
 
 import data_util
@@ -262,7 +261,7 @@ class BaseSeq2Seq2ModelTF:
         current_step = 0
         prev_loss = list()
 
-        print "initializing all variables"
+        logging.info("initializing all variables")
         self.tf_session.run(tf.global_variables_initializer())
 
         while True:
@@ -287,9 +286,11 @@ class BaseSeq2Seq2ModelTF:
 
             if current_step and current_step % test_every == 0:
                 perplexity = math.exp(loss) if loss < test_every else float('inf')
-                print ("global step %d learning rate %.4f step-time %.2f perplexity "
-                       "%.2f" % (self.global_step.eval(self.tf_session), self.lr.eval(self.tf_session),
-                                 step_time, perplexity))
+                logging.info(
+                    "global step {} step-time {} perplexity {}".format(
+                        self.global_step.eval(self.tf_session), step_time, perplexity
+                    )
+                )
 
                 prev_loss.append(loss)
                 self.save_model(step=current_step)
@@ -298,7 +299,7 @@ class BaseSeq2Seq2ModelTF:
                 # Run evals on development set and print their perplexity.
                 for bucket_id in xrange(len(self.buckets)):
                     if len(dev_set[bucket_id]) == 0:
-                        print("  eval: empty bucket %d" % bucket_id)
+                        logging.info("\teval: empty bucket {}: ".format(bucket_id))
                         continue
                     encoder_inputs, decoder_inputs, target_weights = self.get_batch(
                         dev_set, bucket_id
@@ -306,9 +307,9 @@ class BaseSeq2Seq2ModelTF:
                     _, eval_loss, _ = self.predict(
                         encoder_inputs, decoder_inputs, target_weights, bucket_id, True
                     )
+
                     eval_ppx = math.exp(eval_loss) if eval_loss < 300 else float('inf')
-                    print("  eval: bucket %d perplexity %.2f" % (bucket_id, eval_ppx))
-                sys.stdout.flush()
+                    logging.info("\teval: bucket {} perplexity {}".format(bucket_id, eval_ppx))
 
     def close_session(self):
         self.tf_session.close()
