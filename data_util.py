@@ -82,7 +82,7 @@ def create_vocab(vocab_path, data_path, max_vocab_size):
         logging.info("skipping create vocab: {}".format(vocab_path))
 
 
-def get_wrd2idx(vocab_path):
+def get_wrd2idx_idx2wrd(vocab_path):
     if gfile.Exists(vocab_path):
         list_vocab = list()
 
@@ -90,12 +90,22 @@ def get_wrd2idx(vocab_path):
             list_vocab.extend(f.readlines())
 
         list_vocab = [line.strip() for line in list_vocab]
-        word2idx = dict([(x, y) for (y, x) in enumerate(list_vocab)])
+        idx2wrd = dict([(y, x) for (y, x) in enumerate(list_vocab)])
+        wrd2idx = dict([(x, y) for (y, x) in enumerate(list_vocab)])
 
-        return word2idx
+        return wrd2idx, idx2wrd
 
     else:
         raise ValueError("vocab file not found: {}".format(vocab_path))
+
+
+def get_vocab_dict(enc=True):
+    if enc:
+        vocab_path = ConfigHandler.get("vocab_enc", "data_path")
+    else:
+        vocab_path = ConfigHandler.get("vocab_dec", "data_path")
+
+    return get_wrd2idx_idx2wrd(vocab_path)
 
 
 def sentence_to_token_ids(sentence, wrd2idx):
@@ -108,7 +118,7 @@ def data_to_token_ids(data_path, target_path, vocab_path):
 
         logging.info("tokenizing data in {}".format(data_path))
 
-        word2idx = get_wrd2idx(vocab_path)
+        word2idx = get_wrd2idx_idx2wrd(vocab_path)
 
         with gfile.GFile(data_path, mode="rb") as data_file:
             with gfile.GFile(target_path, mode="w") as tokens_file:

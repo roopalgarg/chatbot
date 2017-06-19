@@ -36,9 +36,9 @@ class ConfigHandler:
         return ConfigHandler._cfg.getint(config_mode, key)
 
     @staticmethod
-    def getfloat(key):
-        return ConfigHandler._cfg.getfloat(ConfigHandler.CONFIG_MODE, key)
+    def getfloat(key, config_mode):
+        return ConfigHandler._cfg.getfloat(config_mode, key)
 
     @staticmethod
-    def get_boolean(key):
-        return ConfigHandler._cfg.getboolean(ConfigHandler.CONFIG_MODE, key)
+    def get_boolean(key, config_mode):
+        return ConfigHandler._cfg.getboolean(config_mode, key)

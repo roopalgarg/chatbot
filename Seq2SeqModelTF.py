@@ -79,7 +79,7 @@ class Seq2SeqModelTF(BaseSeq2Seq2ModelTF):
         if not self.fwd_only:
             self.gradient_norms = []
             self.updates = []
-            opt = tf.train.AdamOptimizer(self.lr)
+            opt = tf.train.RMSPropOptimizer(self.lr)
             for b in xrange(len(self.buckets)):
                 gradients = tf.gradients(self.losses[b], trainables)
 

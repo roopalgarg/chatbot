@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 import logging
 import os
+import sys
 import time
 import math
 import random
@@ -314,6 +315,33 @@ class BaseSeq2Seq2ModelTF:
 
                     eval_ppx = math.exp(eval_loss) if eval_loss < 300 else float('inf')
                     logging.info("\teval: bucket {} perplexity {}".format(bucket_id, eval_ppx))
+
+    def test(self, sentence):
+        self.batch_size = 1
+
+        wrd2idx_enc, _ = data_util.get_vocab_dict(enc=True)
+        _, idx2wrd_dec = data_util.get_vocab_dict(enc=False)
+
+        token_ids = data_util.sentence_to_token_ids(tf.compat.as_bytes(sentence), wrd2idx_enc)
+
+        bucket_id = min([b for b in xrange(len(self.buckets)) if self.buckets[b][0] > len(token_ids)])
+
+        # Get a 1-element batch to feed the sentence to the model.
+        encoder_inputs, decoder_inputs, target_weights = self.get_batch({bucket_id: [(token_ids, [])]}, bucket_id)
+
+        # Get output logits for the sentence.
+        _, _, output_logits = self.predict(encoder_inputs, decoder_inputs, target_weights, bucket_id, True)
+
+        # This is a greedy decoder - outputs are just argmaxes of output_logits.
+        outputs = [int(np.argmax(logit, axis=1)) for logit in output_logits]
+
+        # If there is an EOS symbol in outputs, cut them at that point.
+        if TOKENS.EOS.idx in outputs:
+            outputs = outputs[:outputs.index(TOKENS.EOS.idx)]
+
+        logging.info(" ".join([tf.compat.as_str(idx2wrd_dec[output]) for output in outputs]))
+        logging.info("> ")
+        sys.stdout.flush()
 
     def close_session(self):
         self.tf_session.close()
