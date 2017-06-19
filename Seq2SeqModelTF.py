@@ -42,7 +42,9 @@ class Seq2SeqModelTF(BaseSeq2Seq2ModelTF):
     # The seq2seq function: we use embedding for the input and attention.
     def seq2seq_f(self, encoder_inputs, decoder_inputs, do_decode):
         return legacy_seq2seq.embedding_attention_seq2seq(
-            encoder_inputs, decoder_inputs, BaseSeq2Seq2ModelTF.get_cell_definition(self.M, self.num_layers),
+            encoder_inputs,
+            decoder_inputs,
+            BaseSeq2Seq2ModelTF.get_cell_definition(self.M, self.num_layers, self.use_lstm),
             num_encoder_symbols=self.src_vocab_size,
             num_decoder_symbols=self.tgt_vocab_size,
             embedding_size=self.M,

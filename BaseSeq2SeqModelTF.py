@@ -49,6 +49,7 @@ class BaseSeq2Seq2ModelTF:
         self.batch_size = batch_size
         self.num_samples = num_samples
         self.fwd_only = fwd_only
+        self.use_lstm = use_lstm
 
         # self.save_word_emb = save_word_emb
         self.model_name = "model_{model_name}".format(model_name=model_name)
@@ -82,7 +83,7 @@ class BaseSeq2Seq2ModelTF:
         # if self.num_layers > 1:
         #     self.cell = MultiRNNCell([GRUCell(self.M) for _ in range(self.num_layers)])
 
-        self.cell = BaseSeq2Seq2ModelTF.get_cell_definition(self.M, self.num_layers)
+        # self.cell = BaseSeq2Seq2ModelTF.get_cell_definition(self.M, self.num_layers)
 
         # Feeds for inputs.
         self.encoder_inputs = []
@@ -110,8 +111,11 @@ class BaseSeq2Seq2ModelTF:
         self.saver = None
 
     @staticmethod
-    def get_cell_definition(m, num_layers):
-        return MultiRNNCell([GRUCell(m) for _ in range(num_layers)])
+    def get_cell_definition(m, num_layers, use_lstm):
+        if use_lstm:
+            return MultiRNNCell([BasicLSTMCell(m) for _ in range(num_layers)])
+        else:
+            return MultiRNNCell([GRUCell(m) for _ in range(num_layers)])
 
     def add_summary_file_writer(self):
         logging.info("creating filewriter")
