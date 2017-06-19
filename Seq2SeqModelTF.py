@@ -52,13 +52,17 @@ class Seq2SeqModelTF(BaseSeq2Seq2ModelTF):
 
     def build_model(self):
         # Training outputs and losses.
-        if self.fwd_only:
-            self.outputs, self.losses = legacy_seq2seq.model_with_buckets(
-                self.encoder_inputs, self.decoder_inputs, self.targets,
-                self.target_weights, self.buckets, lambda x, y: self.seq2seq_f(x, y, True),
-                softmax_loss_function=self.softmax_loss_function
-            )
+        self.outputs, self.losses = legacy_seq2seq.model_with_buckets(
+            self.encoder_inputs,
+            self.decoder_inputs,
+            self.targets,
+            self.target_weights,
+            self.buckets,
+            lambda x, y: self.seq2seq_f(x, y, self.fwd_only),
+            softmax_loss_function=self.softmax_loss_function
+        )
 
+        if self.fwd_only:
             # If we use output projection, we need to project outputs for decoding.
             if self.output_projection is not None:
                 for b in xrange(len(self.buckets)):
@@ -66,13 +70,6 @@ class Seq2SeqModelTF(BaseSeq2Seq2ModelTF):
                         tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
                         for output in self.outputs[b]
                     ]
-        else:
-            self.outputs, self.losses = legacy_seq2seq.model_with_buckets(
-                self.encoder_inputs, self.decoder_inputs, self.targets,
-                self.target_weights, self.buckets,
-                lambda x, y: self.seq2seq_f(x, y, False),
-                softmax_loss_function=self.softmax_loss_function
-            )
 
         # Gradients and SGD update operation for training the model.
         trainables = tf.trainable_variables()
