@@ -29,7 +29,7 @@ def main():
 
     "beginning training"
     model.fit(
-        enc_train, dec_train, enc_dev, dec_dev, max_train_data_size=640, test_every=100
+        enc_train, dec_train, enc_dev, dec_dev, max_train_data_size=None, test_every=200
     )
 
 if __name__ == "__main__":

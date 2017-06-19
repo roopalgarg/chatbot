@@ -287,8 +287,8 @@ class BaseSeq2Seq2ModelTF:
             if current_step and current_step % test_every == 0:
                 perplexity = math.exp(loss) if loss < test_every else float('inf')
                 logging.info(
-                    "global step {} step-time {} perplexity {}".format(
-                        self.global_step.eval(self.tf_session), step_time, perplexity
+                    "global step {} step-time {} perplexity {} loss {}".format(
+                        self.global_step.eval(self.tf_session), step_time, perplexity, loss
                     )
                 )
 
