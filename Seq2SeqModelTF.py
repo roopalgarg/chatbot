@@ -35,6 +35,7 @@ class Seq2SeqModelTF(BaseSeq2Seq2ModelTF):
         self.build_model()
 
         self.saver = tf.train.Saver(max_to_keep=2)
+        self.train_writer.add_graph(graph=self.tf_session.graph, global_step=1)
 
     # The seq2seq function: we use embedding for the input and attention.
     def seq2seq_f(self, encoder_inputs, decoder_inputs, do_decode):
