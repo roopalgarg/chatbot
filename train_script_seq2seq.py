@@ -24,7 +24,7 @@ def main():
     enc_train, dec_train, enc_dev, dec_dev, _, _ = data_util.prepare_datasets()
 
     model = Seq2SeqModelTF(
-        src_vocab_size=20000, tgt_vocab_size=20000, buckets=BUCKETS, m=256, num_layers=3, mx_grad_nrm=5.0, batch_size=64, lr=0.001, model_name="se2seq",
+        src_vocab_size=20000, tgt_vocab_size=20000, buckets=BUCKETS, m=256, num_layers=3, mx_grad_nrm=5.0, batch_size=64, lr=0.001, model_name="seq2seq",
         save_dir="train_log", use_lstm=False, num_samples=512, fwd_only=False
     )
 
