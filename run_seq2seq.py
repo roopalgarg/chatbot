@@ -1,10 +1,9 @@
 import sys
 import logging
-
+import argparse
 import data_util
 
 from Seq2SeqModelTF import Seq2SeqModelTF
-
 from config.ConfigHandler import ConfigHandler
 
 __author__ = "roopal_garg"
@@ -22,6 +21,10 @@ EXIT_PHRASE = ConfigHandler.get("exit_term", "model_param")
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mode", help="train or test mode", default="test", type=str)
+    args = parser.parse_args()
+
     logging.info("preparing data")
     enc_train, dec_train, enc_dev, dec_dev, _, _ = data_util.prepare_datasets()
 
@@ -43,7 +46,7 @@ def main():
         use_lstm=use_lstm, num_samples=num_samples, fwd_only=False
     )
 
-    mode = ConfigHandler.get("train_mode", "model_param")
+    mode = args.mode
 
     if mode == "train":
         logging.info("mode: training")
