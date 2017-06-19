@@ -1,8 +1,9 @@
 import tensorflow as tf
 
 from BaseSeq2SeqModelTF import BaseSeq2Seq2ModelTF
-
 from tensorflow.contrib import legacy_seq2seq
+
+__author__ = "roopal_garg"
 
 """Sequence-to-sequence model with an attention mechanism."""
 
