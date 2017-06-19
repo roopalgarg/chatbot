@@ -23,13 +23,13 @@ def main():
 
     logging.info("initializing the model")
     model = Seq2SeqModelTF(
-        src_vocab_size=20000, tgt_vocab_size=20000, buckets=BUCKETS, m=256, num_layers=3, mx_grad_nrm=5.0, batch_size=64, lr=0.001, model_name="seq2seq",
+        src_vocab_size=20000, tgt_vocab_size=20000, buckets=BUCKETS, m=256, num_layers=3, mx_grad_nrm=5.0, batch_size=64, lr=0.0001, model_name="seq2seq",
         save_dir="train_log", use_lstm=False, num_samples=512, fwd_only=False
     )
 
     "beginning training"
     model.fit(
-        enc_train, dec_train, enc_dev, dec_dev, max_train_data_size=640, test_every=30
+        enc_train, dec_train, enc_dev, dec_dev, max_train_data_size=640, test_every=100
     )
 
 if __name__ == "__main__":

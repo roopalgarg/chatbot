@@ -35,6 +35,7 @@ class Seq2SeqModelTF(BaseSeq2Seq2ModelTF):
 
         self.build_model()
 
+        self.train_writer = self.add_summary_file_writer()
         self.saver = tf.train.Saver(max_to_keep=2)
         self.train_writer.add_graph(graph=self.tf_session.graph, global_step=1)
 
