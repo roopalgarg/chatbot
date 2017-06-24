@@ -313,7 +313,7 @@ class BaseSeq2Seq2ModelTF:
                         encoder_inputs, decoder_inputs, target_weights, bucket_id, True
                     )
 
-                    eval_ppx = math.exp(eval_loss) if eval_loss < 300 else float('inf')
+                    eval_ppx = math.exp(eval_loss) if eval_loss < test_every else float('inf')
                     logging.info("\teval: bucket {} perplexity {}".format(bucket_id, eval_ppx))
 
     def test(self, sentence):
