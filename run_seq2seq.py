@@ -40,10 +40,16 @@ def main():
     num_samples = ConfigHandler.getint("num_samples", "model_param")
     use_lstm = ConfigHandler.get_boolean("use_lstm", "model_param")
 
+    mode = args.mode
+
+    fwd_only = False
+    if mode == "test":
+        fwd_only = True
+
     model = Seq2SeqModelTF(
         src_vocab_size=vocab_size_enc, tgt_vocab_size=vocab_size_dec, buckets=BUCKETS, m=m, num_layers=num_layers,
         mx_grad_nrm=mx_grad_nrm, batch_size=batch_size, lr=lr, model_name="seq2seq", save_dir="train_log",
-        use_lstm=use_lstm, num_samples=num_samples, fwd_only=False
+        use_lstm=use_lstm, num_samples=num_samples, fwd_only=fwd_only
     )
 
     mode = args.mode
