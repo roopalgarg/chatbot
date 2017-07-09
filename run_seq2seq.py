@@ -22,7 +22,7 @@ EXIT_PHRASE = ConfigHandler.get("exit_term", "model_param")
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", help="train or test mode", default="test", type=str)
+    parser.add_argument("--mode", help="train or test mode", default="train", type=str)
     args = parser.parse_args()
 
     logging.info("preparing data")

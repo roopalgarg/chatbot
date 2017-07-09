@@ -126,10 +126,10 @@ class BaseSeq2Seq2ModelTF:
     def build_model(self):
         pass
 
-    def sampled_loss(self, labels, inputs):
+    def sampled_loss(self, labels, logits):
         labels = tf.reshape(labels, [-1, 1])
         return tf.nn.sampled_softmax_loss(
-            self.W_t, self.b, labels, inputs, self.num_samples, self.tgt_vocab_size
+            self.W_t, self.b, labels, logits, self.num_samples, self.tgt_vocab_size
         )
 
     @staticmethod
